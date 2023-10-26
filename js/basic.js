@@ -154,6 +154,8 @@ class PlayGame extends Phaser.Scene {
 class Scene2 extends Phaser.Scene {
     constructor() {
       super('Scene2');
+      this.monkeySpeed = 300
+      this. monkeyGravity = 1000
     }
 
     preload(){
@@ -193,8 +195,31 @@ class Scene2 extends Phaser.Scene {
       this.physics.add.collider(this.monkey, this.groundGroup);
       this.monkey.setSize(250, 200, true);
   
-      
+      this.cursors = this.input.keyboard.createCursorKeys();
+
       this.visible = true;
+    }
+
+    
+    update() {
+
+        if(this.cursors.left.isDown){
+            this.monkey.body.velocity.x = -gameOption.monkeySpeed;
+        }
+        else if(this.cursors.right.isDown){
+            this.monkey.body.velocity.x = gameOption.monkeySpeed;
+            this.monkey.flipX = true;
+        }
+        // else if(this.cursors.up.isDown){
+        //     this.shootBullet();
+        // }
+        else{
+            this.monkey.body.velocity.x = 0;
+        }
+
+        if (this.cursors.up.isDown && this.monkey.body.touching.down) {
+            this.monkey.body.velocity.y = -gameOption.monkeyGravity / 2.5;
+        }
     }
   }
 
