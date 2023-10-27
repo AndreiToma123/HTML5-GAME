@@ -78,9 +78,9 @@ class PlayGame extends Phaser.Scene {
         this.portal.setOrigin(0.5, 0.5);
         this.physics.add.existing(this.portal);
 
-        this.portal = this.physics.add.image(200, 840, 'portal').setScale(5);
-        this.portal.setOrigin(0.5, 0.5);
-        this.physics.add.existing(this.portal);
+        // this.portal = this.physics.add.image(200, 840, 'portal').setScale(5);
+        // this.portal.setOrigin(0.5, 0.5);
+        // this.physics.add.existing(this.portal);
 
         this.groundGroup = this.physics.add.group({
             immovable: true,
@@ -133,7 +133,7 @@ class PlayGame extends Phaser.Scene {
             allowGravity: false
         })
 
-        this.enemyGroup.create(300, 870, 'robot').setScale(0.35).setFlipX(true);
+        this.enemyGroup.create(390, 835, 'robot').setScale(0.30).setFlipX(true);
 
         this.physics.add.overlap(this.enemyGroup, this.bulletGroup, this.killEnemy, null, this);
 
@@ -141,6 +141,7 @@ class PlayGame extends Phaser.Scene {
 
         this.physics.add.overlap(this.monkey, this.fruitGroup, this.collectFruit, null, this);
         this.physics.add.overlap(this.monkey, this.portal, this.teleportPlayer, null, this);
+        this.physics.add.overlap(this.monkey, this.enemyGroup, this.damageMonkey, null, this);
         
 }
 
@@ -174,6 +175,13 @@ class PlayGame extends Phaser.Scene {
         bullet.destroy();
     }
 
+    damageMonkey(monkey, enemy){
+        this.health -= 1;
+
+        this.initialPosition = this.monkey.x;
+        this.monkey.x = this.initialPosition - 50;
+    }
+
     teleportPlayer() {
         this.teleport_sound.play();
         this.scene.start('Scene2');
@@ -201,7 +209,8 @@ class PlayGame extends Phaser.Scene {
         }
 
         if(this.health <= 0){
-            this.scene.start('PlayGame');
+            this.scene.restart();
+            this.health = 3;
         }
 
         this.bulletGroup.children.iterate(bullet => {
@@ -331,13 +340,20 @@ class Scene2 extends Phaser.Scene {
             maxSize: 1
         })
 
-        // this.physics.add.overlap(this.bombGroup, this.bulletGroup, this.defuseBomb, null, this);
+        this.enemyGroup = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        })
+
+        this.enemyGroup.create(620, 480, 'robot').setScale(0.30).setFlipX(true);
+        this.enemyGroup.create(620, 180, 'robot').setScale(0.30).setFlipX(true);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.overlap(this.monkey, this.fruitGroup, this.collectFruit, null, this);
-        this.physics.add.overlap(this.groundGroup, this.bombGroup, this.explodeBomb, null, this);
         this.physics.add.overlap(this.monkey, this.portal, this.teleportPlayer, null, this);
+        this.physics.add.overlap(this.enemyGroup, this.bulletGroup, this.killEnemy, null, this);
+        this.physics.add.overlap(this.monkey, this.enemyGroup, this.damageMonkey, null, this);
         
 }
 
@@ -364,6 +380,13 @@ class Scene2 extends Phaser.Scene {
             this.bulletGroup.setActive(true);
             this.bulletGroup.setVisible(true);
             this.bulletGroup.setVelocityX(1000);
+    }
+
+    damageMonkey(monkey, enemy){
+        this.health -= 1;
+
+        this.initialPosition = this.monkey.x;
+        this.monkey.x = this.initialPosition - 50;
     }
 
     teleportPlayer() {
@@ -393,7 +416,8 @@ class Scene2 extends Phaser.Scene {
         }
 
         if(this.health <= 0){
-            this.scene.start('Scene2');
+            this.scene.restart();
+            this.health =  3;
         }
 
         this.bulletGroup.children.iterate(bullet => {
