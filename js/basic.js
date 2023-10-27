@@ -6,7 +6,7 @@ const gameOption = {
    }
 
    let score = 0;
-    let health = 3;
+   let health = 3;
 
 window.onload = function(){
     let gameConfig = {
@@ -70,8 +70,12 @@ class PlayGame extends Phaser.Scene {
 
         this.background = this.add.image(0, 0, 'background').setOrigin(0, 0);
 
-        this.scoreText = this.add.text(8, 3, "0", {fontSize: "50px", fill: "#ffffff"})
-
+        this.scoreText = this.add.text(8, 3, "Score:", {fontSize: "50px", fill: "#ffffff"})
+        this.scoreTextPoints = this.add.text(185, 8, "0", {fontSize: "50px", fill: "#ffffff"})
+        
+        this.HealthText = this.add.text(8, 60, "Health:", {fontSize: "50px", fill: "#ffffff"})
+        this.HealthTextPoints = this.add.text(214, 62, "3", {fontSize: "50px", fill: "#ffffff"})
+        
         this.restartText = this.add.text(1380, 3,"Restart",{fontSize: '50px', fill: '#ffffff'})
         this.restartText.setInteractive();
         this.restartText.on('pointerdown', () => {
@@ -81,8 +85,6 @@ class PlayGame extends Phaser.Scene {
         });
 
         this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
-        this.portal.setOrigin(0.5, 0.5);
-        this.physics.add.existing(this.portal);
 
         this.groundGroup = this.physics.add.group({
             immovable: true,
@@ -104,8 +106,8 @@ class PlayGame extends Phaser.Scene {
         this.groundGroup.create(1550, 970, 'ground');
         
         for (let i = 0; i < 2; i++) {
-            const movingPlatform = this.moveableGroundGroupX.create(900 + i * 100, 970, 'ground'); 
-            movingPlatform.setVelocityX(100); 
+            const movingGround = this.moveableGroundGroupX.create(900 + i * 100, 970, 'ground'); 
+            movingGround.setVelocityX(100); 
         }
 
         this.monkey = this.physics.add.sprite(50, 870, 'monkey').setScale(0.2);
@@ -137,14 +139,13 @@ class PlayGame extends Phaser.Scene {
 
         this.enemyGroup.create(390, 835, 'robot').setScale(0.30).setFlipX(true);
 
-        this.physics.add.overlap(this.enemyGroup, this.bulletGroup, this.killEnemy, null, this);
-
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.overlap(this.monkey, this.fruitGroup, this.collectFruit, null, this);
         this.physics.add.overlap(this.monkey, this.portal, this.teleportPlayer, null, this);
         this.physics.add.overlap(this.monkey, this.enemyGroup, this.damageMonkey, null, this);
-        
+        this.physics.add.overlap(this.enemyGroup, this.bulletGroup, this.killEnemy, null, this);
+
 }
 
     collectFruit(monkey, fruit) {
@@ -152,15 +153,15 @@ class PlayGame extends Phaser.Scene {
         this.coin_sound.play();
         if(fruit.texture.key === "pear"){
             score += 1;
-            this.scoreText.setText(score);
+            this.scoreTextPoints.setText(score);
         }
         if(fruit.texture.key === "orange"){
             score += 5;
-            this.scoreText.setText(score);
+            this.scoreTextPoints.setText(score);
         }
         if(fruit.texture.key === "banana"){
             score += 10;
-            this.scoreText.setText(score);
+            this.scoreTextPoints.setText(score);
         }
     }
 
@@ -179,6 +180,7 @@ class PlayGame extends Phaser.Scene {
 
     damageMonkey(monkey, enemy){
         health -= 1;
+        this.HealthTextPoints.setText(health)
 
         this.initialPosition = this.monkey.x;
         this.monkey.x = this.initialPosition - 50;
@@ -238,8 +240,6 @@ class PlayGame extends Phaser.Scene {
 class Scene2 extends Phaser.Scene {
     constructor() {
       super('Scene2');
-      this.monkeySpeed = 300;
-      this. monkeyGravity = 1000;
     }
 
     preload(){
@@ -268,14 +268,17 @@ class Scene2 extends Phaser.Scene {
 
         this.background = this.add.image(0, 0, 'background').setOrigin(0, 0);
 
-        this.scoreText = this.add.text(8, 3, "0", {fontSize: "50px", fill: "#ffffff"})
-
+        this.scoreText = this.add.text(8, 3, "Score:", {fontSize: "50px", fill: "#ffffff"})
+        this.scoreTextPoints = this.add.text(185, 8, "0", {fontSize: "50px", fill: "#ffffff"})
+        
+        this.HealthText = this.add.text(8, 60, "Health:", {fontSize: "50px", fill: "#ffffff"})
+        this.HealthTextPoints = this.add.text(214, 62, "3", {fontSize: "50px", fill: "#ffffff"})
+        
         this.restartText = this.add.text(1380, 3,"Restart",{fontSize: '50px', fill: '#ffffff'})
         this.restartText.setInteractive();
         this.restartText.on('pointerdown', () => {this.scene.restart()});
 
         this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
-        this.physics.add.existing(this.portal);
 
         this.groundGroup = this.physics.add.group({
             immovable: true,
@@ -294,7 +297,6 @@ class Scene2 extends Phaser.Scene {
      
         this.groundGroup.create(60, 970, 'ground');
         this.groundGroup.create(1550, 970, 'ground');
-
         this.groundGroup.create(620, 600, 'ground');
         this.groundGroup.create(749, 600, 'ground');
         this.groundGroup.create(620, 300, 'ground');
@@ -358,15 +360,15 @@ class Scene2 extends Phaser.Scene {
         this.coin_sound.play();
         if(fruit.texture.key === "pear"){
             score += 1;
-            this.scoreText.setText(score);
+            this.scoreTextPoints.setText(score);
         }
         if(fruit.texture.key === "orange"){
             score += 5;
-            this.scoreText.setText(score);
+            this.scoreTextPoints.setText(score);
         }
         if(fruit.texture.key === "banana"){
             score += 10;
-            this.scoreText.setText(score);
+            this.scoreTextPoints.setText(score);
         }
     }
 
@@ -385,6 +387,7 @@ class Scene2 extends Phaser.Scene {
 
     damageMonkey(monkey, enemy){
         health -= 1;
+        this.HealthTextPoints.setText(health);
 
         this.initialPosition = this.monkey.x;
         this.monkey.x = this.initialPosition - 50;
@@ -465,8 +468,8 @@ class EndMenu extends Phaser.Scene {
         this.restartText.setInteractive();
         this.restartText.on('pointerdown', () => {
         this.scene.start('PlayGame')
+        score = 0;
     });
     }
 
 }
-
