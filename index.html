@@ -6,17 +6,21 @@
     <title>Name input</title>
 </head>
 <body>    
-        <input type="text" id="name">
-        <a href="game.html"><button id="startButton">Start Game</button></a>
+    <input type="text" id="name" placeholder="Enter name">
+    <a href="game.html"><button id="startButton">Start Game</button></a>
 
-        <script>
-            const startButton = document.getElementById("startButton");
-            startButton.addEventListener("click", function() {
-                const playerName = document.getElementById("nameInput").value;
-                console.log(playerName); // Logging the entered name
-            });
-        </script>
+    <p>
+        Game instructions:<br><br>
+
+        UP - jump<br>
+        LEFT/RIGHT - go left/right<br>
+        MOUSE LEFT CLICK - shoot<br><br>
+
+        If player is hit by enemy 3 times player dies and scene restarts<br>
+        If player falls out of the map the user should press 'Restart' button in top right corner of the screen<br>
+        Different fruits give you different scores<br>
+        Enter the portals to continue to the next level
+    </p>
+        
 </body>
-
-
 </html>
