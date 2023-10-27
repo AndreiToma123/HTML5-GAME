@@ -225,11 +225,11 @@ class PlayGame extends Phaser.Scene {
             }
         });
 
-        this.moveableGroundGroupX.getChildren().forEach(movingPlatform => {
-            if (movingPlatform.x >= 1200) {
-                movingPlatform.setVelocityX(-100);
-            } else if (movingPlatform.x <= 840) {
-                movingPlatform.setVelocityX(100);
+        this.moveableGroundGroupX.getChildren().forEach(movingGround => {
+            if (movingGround.x >= 1200) {
+                movingGround.setVelocityX(-100);
+            } else if (movingGround.x <= 840) {
+                movingGround.setVelocityX(100);
             }
         });
     }
@@ -304,13 +304,13 @@ class Scene2 extends Phaser.Scene {
 
         
         for (let i = 0; i < 2; i++) {
-            const movingPlatform = this.moveableGroundGroupY.create(300 + i * 100, 970, 'ground'); 
-            movingPlatform.setVelocityY(100); 
+            const movingGround = this.moveableGroundGroupY.create(300 + i * 100, 970, 'ground'); 
+            movingGround.setVelocityY(100); 
         }
         
         for (let i = 0; i < 2; i++) {
-            const movingPlatform = this.moveableGroundGroupX.create(900 + i * 100, 300, 'ground'); 
-            movingPlatform.setVelocityX(100); 
+            const movingGround = this.moveableGroundGroupX.create(900 + i * 100, 300, 'ground'); 
+            movingGround.setVelocityX(100); 
         }
 
         this.monkey = this.physics.add.sprite(50, 870, 'monkey').setScale(0.2);
@@ -431,19 +431,19 @@ class Scene2 extends Phaser.Scene {
             }
         });
 
-        this.moveableGroundGroupX.getChildren().forEach(movingPlatform => {
-            if (movingPlatform.x >= 1200) {
-                movingPlatform.setVelocityX(-100);
-            } else if (movingPlatform.x <= 940) {
-                movingPlatform.setVelocityX(100);
+        this.moveableGroundGroupX.getChildren().forEach(movingGround => {
+            if (movingGround.x >= 1200) {
+                movingGround.setVelocityX(-100);
+            } else if (movingGround.x <= 940) {
+                movingGround.setVelocityX(100);
             }
         });
 
-        this.moveableGroundGroupY.getChildren().forEach(movingPlatform => {
-            if (movingPlatform.y >= 970) {
-                movingPlatform.setVelocityY(-100);
-            } else if (movingPlatform.y <= 300) {
-                movingPlatform.setVelocityY(100);
+        this.moveableGroundGroupY.getChildren().forEach(movingGround => {
+            if (movingGround.y >= 970) {
+                movingGround.setVelocityY(-100);
+            } else if (movingGround.y <= 300) {
+                movingGround.setVelocityY(100);
             }
         });
     }
