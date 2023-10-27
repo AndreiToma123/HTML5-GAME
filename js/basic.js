@@ -39,8 +39,6 @@ class PlayGame extends Phaser.Scene {
 
     constructor() {
         super("PlayGame")
-        // this.score = 0;
-        // this.health = 3;
     }
 
     preload(){
@@ -61,8 +59,8 @@ class PlayGame extends Phaser.Scene {
     }
 
     create(){
-        // this.backgroundMusic = this.sound.add("soundtrack", {loop: true}); NEED THIS
-        // this.backgroundMusic.play();
+        this.backgroundMusic = this.sound.add("soundtrack", {loop: true}); 
+        this.backgroundMusic.play();
 
         this.coin_sound = this.sound.add('coin');
         this.jump_sound = this.sound.add('jump');
@@ -75,15 +73,15 @@ class PlayGame extends Phaser.Scene {
 
         this.restartText = this.add.text(1380, 3,"Restart",{fontSize: '50px', fill: '#ffffff'})
         this.restartText.setInteractive();
-        this.restartText.on('pointerdown', () => {this.scene.restart()});
+        this.restartText.on('pointerdown', () => {
+            this.scene.restart();
+            this.backgroundMusic.stop();
+            this.backgroundMusic.destroy();
+        });
 
         this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
         this.portal.setOrigin(0.5, 0.5);
         this.physics.add.existing(this.portal);
-
-        // this.portal = this.physics.add.image(200, 840, 'portal').setScale(5);
-        // this.portal.setOrigin(0.5, 0.5);
-        // this.physics.add.existing(this.portal);
 
         this.groundGroup = this.physics.add.group({
             immovable: true,
@@ -152,16 +150,16 @@ class PlayGame extends Phaser.Scene {
         fruit.disableBody(true, true);
         this.coin_sound.play();
         if(fruit.texture.key === "pear"){
-            this.score += 1;
-            this.scoreText.setText(this.score);
+            score += 1;
+            this.scoreText.setText(score);
         }
         if(fruit.texture.key === "orange"){
-            this.score += 5;
-            this.scoreText.setText(this.score);
+            score += 5;
+            this.scoreText.setText(score);
         }
         if(fruit.texture.key === "banana"){
-            this.score += 10;
-            this.scoreText.setText(this.score);
+            score += 10;
+            this.scoreText.setText(score);
         }
     }
 
@@ -179,7 +177,7 @@ class PlayGame extends Phaser.Scene {
     }
 
     damageMonkey(monkey, enemy){
-        this.health -= 1;
+        health -= 1;
 
         this.initialPosition = this.monkey.x;
         this.monkey.x = this.initialPosition - 50;
@@ -211,9 +209,11 @@ class PlayGame extends Phaser.Scene {
             this.jump_sound.play();
         }
 
-        if(this.health <= 0){
+        if(health <= 0){
             this.scene.restart();
-            this.health = 3;
+            this.backgroundMusic.stop();
+            this.backgroundMusic.destroy();
+            health = 3;
         }
 
         this.bulletGroup.children.iterate(bullet => {
@@ -242,10 +242,8 @@ class PlayGame extends Phaser.Scene {
 class Scene2 extends Phaser.Scene {
     constructor() {
       super('Scene2');
-    //   this.score = 0;
       this.monkeySpeed = 300;
       this. monkeyGravity = 1000;
-    //   this.health = 3;
     }
 
     preload(){
@@ -364,16 +362,16 @@ class Scene2 extends Phaser.Scene {
         fruit.disableBody(true, true);
         this.coin_sound.play();
         if(fruit.texture.key === "pear"){
-            this.score += 1;
-            this.scoreText.setText(this.score);
+            score += 1;
+            this.scoreText.setText(score);
         }
         if(fruit.texture.key === "orange"){
-            this.score += 5;
-            this.scoreText.setText(this.score);
+            score += 5;
+            this.scoreText.setText(score);
         }
         if(fruit.texture.key === "banana"){
-            this.score += 10;
-            this.scoreText.setText(this.score);
+            score += 10;
+            this.scoreText.setText(score);
         }
     }
 
@@ -386,7 +384,7 @@ class Scene2 extends Phaser.Scene {
     }
 
     damageMonkey(monkey, enemy){
-        this.health -= 1;
+        health -= 1;
 
         this.initialPosition = this.monkey.x;
         this.monkey.x = this.initialPosition - 50;
@@ -418,9 +416,9 @@ class Scene2 extends Phaser.Scene {
             this.jump_sound.play();
         }
 
-        if(this.health <= 0){
+        if(health <= 0){
             this.scene.restart();
-            this.health =  3;
+            health =  3;
         }
 
         this.bulletGroup.children.iterate(bullet => {
