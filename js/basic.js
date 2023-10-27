@@ -37,6 +37,7 @@ class PlayGame extends Phaser.Scene {
     constructor() {
         super("PlayGame")
         this.score = 0;
+        this.health = 3;
     }
 
     preload(){
@@ -46,7 +47,7 @@ class PlayGame extends Phaser.Scene {
         this.load.image("banana", "assets/items/banana.png");
         this.load.image("pear", "assets/items/pear.png");
         this.load.image("orange", "assets/items/orange.png");
-        this.load.image("bomb", "assets/items/bomb.png");
+        this.load.image("robot", "assets/robot.png");
         this.load.image("bullet", "assets/items/ninja_star.png");
         this.load.image('portal', 'assets/world/portal.png');
         this.load.audio('coin', "assets/sound_effects/coin.mp3");
@@ -69,32 +70,39 @@ class PlayGame extends Phaser.Scene {
 
         this.scoreText = this.add.text(8, 3, "0", {fontSize: "50px", fill: "#ffffff"})
 
-        // this.portal = this.physics.add.image(400, 840, 'portal').setScale(5);
-        // this.portal.setOrigin(0.5, 0.5);
-        // this.physics.add.existing(this.portal);
+        this.restartText = this.add.text(1380, 3,"Restart",{fontSize: '50px', fill: '#ffffff'})
+        this.restartText.setInteractive();
+        this.restartText.on('pointerdown', () => {this.scene.restart()});
+
+        this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
+        this.portal.setOrigin(0.5, 0.5);
+        this.physics.add.existing(this.portal);
+
+        this.portal = this.physics.add.image(200, 840, 'portal').setScale(5);
+        this.portal.setOrigin(0.5, 0.5);
+        this.physics.add.existing(this.portal);
 
         this.groundGroup = this.physics.add.group({
             immovable: true,
             allowGravity: false,
         })
 
-        this.moveableGroundGroup = this.physics.add.group({
+        this.moveableGroundGroupX = this.physics.add.group({
             immovable: true,
             allowGravity: false,
         })
-
-       
-
+     
         this.groundGroup.create(60, 970, 'ground');
         this.groundGroup.create(180, 970, 'ground');
         this.groundGroup.create(300, 970, 'ground');
         this.groundGroup.create(420, 970, 'ground');
         this.groundGroup.create(540, 970, 'ground');
         this.groundGroup.create(660, 970, 'ground');
-        this.groundGroup.create(780, 970, 'ground');
-
-        for (let i = 0; i < 3; i++) {
-            const movingPlatform = this.moveableGroundGroup.create(900 + i * 100, 970, 'ground'); 
+        this.groundGroup.create(1422, 970, 'ground');
+        this.groundGroup.create(1550, 970, 'ground');
+        
+        for (let i = 0; i < 2; i++) {
+            const movingPlatform = this.moveableGroundGroupX.create(900 + i * 100, 970, 'ground'); 
             movingPlatform.setVelocityX(100); 
         }
 
@@ -102,22 +110,36 @@ class PlayGame extends Phaser.Scene {
         this.monkey.body.setCollideWorldBounds(true);
         this.monkey.body.gravity.y = gameOption.monkeyGravity;
         this.physics.add.collider(this.monkey, this.groundGroup);
-        this.physics.add.collider(this.monkey, this.moveableGroundGroup);
+        this.physics.add.collider(this.monkey, this.moveableGroundGroupX);
         this.monkey.setSize(250, 200, true);
 
-        this.fruitGroup = this.physics.add.group({})
+        this.fruitGroup = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        })
+
+        this.fruitGroup.create(650, 890, 'orange').setScale(0.4)
+        this.fruitGroup.create(840, 890, 'pear').setScale(0.4)
+        this.fruitGroup.create(1000, 890, 'pear').setScale(0.4)
+        this.fruitGroup.create(1180, 890, 'pear').setScale(0.4)
 
         this.bulletGroup = this.physics.add.group({
             defaultKey: 'bullet',
             maxSize: 1
         })
 
-        // this.physics.add.overlap(this.bombGroup, this.bulletGroup, this.defuseBomb, null, this);
+        this.enemyGroup = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        })
+
+        this.enemyGroup.create(300, 870, 'robot').setScale(0.35).setFlipX(true);
+
+        this.physics.add.overlap(this.enemyGroup, this.bulletGroup, this.killEnemy, null, this);
 
         this.cursors = this.input.keyboard.createCursorKeys();
 
         this.physics.add.overlap(this.monkey, this.fruitGroup, this.collectFruit, null, this);
-        this.physics.add.overlap(this.groundGroup, this.bombGroup, this.explodeBomb, null, this);
         this.physics.add.overlap(this.monkey, this.portal, this.teleportPlayer, null, this);
         
 }
@@ -144,7 +166,12 @@ class PlayGame extends Phaser.Scene {
             this.bulletGroup.get(this.monkey.x, this.monkey.y);
             this.bulletGroup.setActive(true);
             this.bulletGroup.setVisible(true);
-            this.bulletGroup.setVelocityX(600);
+            this.bulletGroup.setVelocityX(1000);
+    }
+
+    killEnemy(enemy, bullet){
+        enemy.destroy();
+        bullet.destroy();
     }
 
     teleportPlayer() {
@@ -173,16 +200,20 @@ class PlayGame extends Phaser.Scene {
             this.jump_sound.play();
         }
 
+        if(this.health <= 0){
+            this.scene.start('PlayGame');
+        }
+
         this.bulletGroup.children.iterate(bullet => {
             if (bullet.x < 0 || bullet.x > this.game.config.width) {
                 bullet.destroy(); 
             }
         });
 
-        this.moveableGroundGroup.getChildren().forEach(movingPlatform => {
-            if (movingPlatform.x >= 1600) {
+        this.moveableGroundGroupX.getChildren().forEach(movingPlatform => {
+            if (movingPlatform.x >= 1200) {
                 movingPlatform.setVelocityX(-100);
-            } else if (movingPlatform.x <= 900) {
+            } else if (movingPlatform.x <= 840) {
                 movingPlatform.setVelocityX(100);
             }
         });
@@ -199,8 +230,10 @@ class PlayGame extends Phaser.Scene {
 class Scene2 extends Phaser.Scene {
     constructor() {
       super('Scene2');
-      this.monkeySpeed = 300
-      this. monkeyGravity = 1000
+      this.score = 0;
+      this.monkeySpeed = 300;
+      this. monkeyGravity = 1000;
+      this.health = 3;
     }
 
     preload(){
@@ -228,28 +261,70 @@ class Scene2 extends Phaser.Scene {
         this.teleport_sound = this.sound.add('teleport');
 
         this.background = this.add.image(0, 0, 'background').setOrigin(0, 0);
-        this.groundGroup = this.physics.add.group({
-            immovable: true,
-            allowGravity: false,
-        })
 
         this.scoreText = this.add.text(8, 3, "0", {fontSize: "50px", fill: "#ffffff"})
+
+        this.restartText = this.add.text(1380, 3,"Restart",{fontSize: '50px', fill: '#ffffff'})
+        this.restartText.setInteractive();
+        this.restartText.on('pointerdown', () => {this.scene.restart()});
 
         this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
         this.portal.setOrigin(0.5, 0.5);
         this.physics.add.existing(this.portal);
 
+        this.groundGroup = this.physics.add.group({
+            immovable: true,
+            allowGravity: false,
+        })
+
+        this.moveableGroundGroupX = this.physics.add.group({
+            immovable: true,
+            allowGravity: false,
+        })
+
+        this.moveableGroundGroupY = this.physics.add.group({
+            immovable: true,
+            allowGravity: false,
+        })
+     
         this.groundGroup.create(60, 970, 'ground');
-        this.groundGroup.create(180, 970, 'ground');
+        this.groundGroup.create(1550, 970, 'ground');
+
+        this.groundGroup.create(620, 600, 'ground');
+        this.groundGroup.create(749, 600, 'ground');
+        this.groundGroup.create(620, 300, 'ground');
+        this.groundGroup.create(749, 300, 'ground');
+
         
+        for (let i = 0; i < 2; i++) {
+            const movingPlatform = this.moveableGroundGroupY.create(300 + i * 100, 970, 'ground'); 
+            movingPlatform.setVelocityY(100); 
+        }
+        
+        for (let i = 0; i < 2; i++) {
+            const movingPlatform = this.moveableGroundGroupX.create(900 + i * 100, 300, 'ground'); 
+            movingPlatform.setVelocityX(100); 
+        }
 
         this.monkey = this.physics.add.sprite(50, 870, 'monkey').setScale(0.2);
         this.monkey.body.setCollideWorldBounds(true);
         this.monkey.body.gravity.y = gameOption.monkeyGravity;
         this.physics.add.collider(this.monkey, this.groundGroup);
+        this.physics.add.collider(this.monkey, this.moveableGroundGroupX);
+        this.physics.add.collider(this.monkey, this.moveableGroundGroupY);
         this.monkey.setSize(250, 200, true);
 
-        this.fruitGroup = this.physics.add.group({})
+        this.fruitGroup = this.physics.add.group({
+            immovable: true,
+            allowGravity: false
+        })
+
+        this.fruitGroup.create(750, 520, 'banana').setScale(0.4)
+        this.fruitGroup.create(750, 220, 'orange').setScale(0.4)
+        this.fruitGroup.create(340, 820, 'pear').setScale(0.4)
+        this.fruitGroup.create(340, 620, 'pear').setScale(0.4)
+        this.fruitGroup.create(340, 420, 'pear').setScale(0.4)
+        this.fruitGroup.create(340, 220, 'pear').setScale(0.4)
 
         this.bulletGroup = this.physics.add.group({
             defaultKey: 'bullet',
@@ -263,9 +338,8 @@ class Scene2 extends Phaser.Scene {
         this.physics.add.overlap(this.monkey, this.fruitGroup, this.collectFruit, null, this);
         this.physics.add.overlap(this.groundGroup, this.bombGroup, this.explodeBomb, null, this);
         this.physics.add.overlap(this.monkey, this.portal, this.teleportPlayer, null, this);
-
-      this.visible = true;
-    }
+        
+}
 
     collectFruit(monkey, fruit) {
         fruit.disableBody(true, true);
@@ -289,15 +363,14 @@ class Scene2 extends Phaser.Scene {
             this.bulletGroup.get(this.monkey.x, this.monkey.y);
             this.bulletGroup.setActive(true);
             this.bulletGroup.setVisible(true);
-            this.bulletGroup.setVelocityY(-600);
+            this.bulletGroup.setVelocityX(1000);
     }
 
     teleportPlayer() {
         this.teleport_sound.play();
-        this.scene.start('EndMenu');
+        this.scene.start('Scene2');
     }
 
-    
     update() {
 
         if(this.cursors.left.isDown){
@@ -319,11 +392,35 @@ class Scene2 extends Phaser.Scene {
             this.jump_sound.play();
         }
 
+        if(this.health <= 0){
+            this.scene.start('Scene2');
+        }
+
         this.bulletGroup.children.iterate(bullet => {
-            if (bullet.y < 0 || bullet.y > this.game.config.height) {
+            if (bullet.x < 0 || bullet.x > this.game.config.width) {
                 bullet.destroy(); 
             }
         });
+
+        this.moveableGroundGroupX.getChildren().forEach(movingPlatform => {
+            if (movingPlatform.x >= 1200) {
+                movingPlatform.setVelocityX(-100);
+            } else if (movingPlatform.x <= 940) {
+                movingPlatform.setVelocityX(100);
+            }
+        });
+
+        this.moveableGroundGroupY.getChildren().forEach(movingPlatform => {
+            if (movingPlatform.y >= 970) {
+                movingPlatform.setVelocityY(-100);
+            } else if (movingPlatform.y <= 300) {
+                movingPlatform.setVelocityY(100);
+            }
+        });
+    }
+
+    gameOver() {
+        this.scene.start("EndMenu", { score: this.score });
     }
   }
 
