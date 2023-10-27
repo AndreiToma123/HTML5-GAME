@@ -5,6 +5,9 @@ const gameOption = {
     monkeyGravity: 1000
    }
 
+   let score = 0;
+    let health = 3;
+
 window.onload = function(){
     let gameConfig = {
         type: Phaser.AUTO,
@@ -36,8 +39,8 @@ class PlayGame extends Phaser.Scene {
 
     constructor() {
         super("PlayGame")
-        this.score = 0;
-        this.health = 3;
+        // this.score = 0;
+        // this.health = 3;
     }
 
     preload(){
@@ -239,10 +242,10 @@ class PlayGame extends Phaser.Scene {
 class Scene2 extends Phaser.Scene {
     constructor() {
       super('Scene2');
-      this.score = 0;
+    //   this.score = 0;
       this.monkeySpeed = 300;
       this. monkeyGravity = 1000;
-      this.health = 3;
+    //   this.health = 3;
     }
 
     preload(){
