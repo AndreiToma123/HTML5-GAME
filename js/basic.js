@@ -28,6 +28,7 @@ window.onload = function(){
             }
         },
         scene: [PlayGame, Scene2, EndMenu],
+        backgroundMusic: null,
     },
     game = new Phaser.Game(gameConfig)
     window.focus();
@@ -59,8 +60,8 @@ class PlayGame extends Phaser.Scene {
     }
 
     create(){
-        this.backgroundMusic = this.sound.add("soundtrack", {loop: true}); 
-        this.backgroundMusic.play();
+        this.game.config.backgroundMusic = this.sound.add("soundtrack", { loop: true });
+        this.game.config.backgroundMusic.play();
 
         this.coin_sound = this.sound.add('coin');
         this.jump_sound = this.sound.add('jump');
@@ -75,8 +76,8 @@ class PlayGame extends Phaser.Scene {
         this.restartText.setInteractive();
         this.restartText.on('pointerdown', () => {
             this.scene.restart();
-            this.backgroundMusic.stop();
-            this.backgroundMusic.destroy();
+            this.game.config.backgroundMusic.stop();
+            this.game.config.backgroundMusic.destroy();
         });
 
         this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
@@ -211,8 +212,8 @@ class PlayGame extends Phaser.Scene {
 
         if(health <= 0){
             this.scene.restart();
-            this.backgroundMusic.stop();
-            this.backgroundMusic.destroy();
+            this.game.config.backgroundMusic.stop();
+            this.game.config.backgroundMusic.destroy();
             health = 3;
         }
 
@@ -230,11 +231,6 @@ class PlayGame extends Phaser.Scene {
             }
         });
     }
-
-    gameOver() {
-        this.scene.start("EndMenu", { score: this.score });
-    }
-
 }
 
 
@@ -279,7 +275,6 @@ class Scene2 extends Phaser.Scene {
         this.restartText.on('pointerdown', () => {this.scene.restart()});
 
         this.portal = this.physics.add.image(1550, 840, 'portal').setScale(5);
-        this.portal.setOrigin(0.5, 0.5);
         this.physics.add.existing(this.portal);
 
         this.groundGroup = this.physics.add.group({
@@ -383,6 +378,11 @@ class Scene2 extends Phaser.Scene {
             this.bulletGroup.setVelocityX(1000);
     }
 
+    killEnemy(enemy, bullet){
+        enemy.destroy();
+        bullet.destroy();
+    }
+
     damageMonkey(monkey, enemy){
         health -= 1;
 
@@ -392,7 +392,8 @@ class Scene2 extends Phaser.Scene {
 
     teleportPlayer() {
         this.teleport_sound.play();
-        this.scene.start('Scene2');
+        this.scene.start('EndMenu');
+        
     }
 
     update() {
@@ -444,9 +445,6 @@ class Scene2 extends Phaser.Scene {
         });
     }
 
-    gameOver() {
-        this.scene.start("EndMenu", { score: this.score });
-    }
   }
 
 
@@ -455,16 +453,19 @@ class EndMenu extends Phaser.Scene {
         super("EndMenu");
     }
 
-    create(data) {
-        const score = data.score;
-        const endText = this.add.text(this.game.config.width / 2, this.game.config.height / 2, `Game Over\nScore: ${score}`, {
-            fontSize: "32px",
-            fill: "#ffffff",
-        });
+    create(){
+        this.game.config.backgroundMusic.stop();
+        this.game.config.backgroundMusic.destroy();
+        
+        this.scoreText = this.add.text(650, 20, "Game over", {fontSize: "60px", fill: "#ffffff"})
+        this.scoreText = this.add.text(740, 100, "Score:", {fontSize: "50px", fill: "#ffffff"})
+        this.scoreText = this.add.text(780, 170, score, {fontSize: "50px", fill: "#ffffff"})
 
-        this.input.keyboard.on("keydown-SPACE", () => {
-            this.scene.start("PlayGame");
-        });
+        this.restartText = this.add.text(650, 420,"Play again",{fontSize: '50px', fill: '#ffffff'})
+        this.restartText.setInteractive();
+        this.restartText.on('pointerdown', () => {
+        this.scene.start('PlayGame')
+    });
     }
 
 }
